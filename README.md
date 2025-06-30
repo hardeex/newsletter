@@ -1,61 +1,241 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Essential Nigeria Newsletter API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A robust and flexible API for subscribing, unsubscribing, and managing newsletters. This API ensures smooth communication with users while maintaining security through throttling, bot protection, and IP blocklists.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## **Features**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* **Email Subscription:** Users can subscribe to the newsletter using their email address and platform information.
+* **Email Resubscription:** If a user is already subscribed and unsubscribed, they will receive a re-subscription process with a welcome email.
+* **Unsubscription:** Users can unsubscribe using a unique token, preventing further communications.
+* **Bot Detection:** Honeypot field used to detect bots and prevent spam sign-ups.
+* **IP Blocklist:** Protects the system from blacklisted IP addresses.
+* **Rate Limiting:** Throttles requests to prevent abuse (2 requests per minute per user).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## **Installation**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### **Prerequisites**
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+* PHP >= 8.0
+* Laravel >= 8.x
+* Composer
+* MySQL or other database systems supported by Laravel
+* Mailer setup (e.g., SMTP, Mailgun, etc.)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### **Steps to Set Up the Project**
 
-## Laravel Sponsors
+1. **Clone the Repository:**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+   ```bash
+   git clone https://github.com/hardeex/newsletter
+   cd essential-newsletter-api
+   ```
 
-### Premium Partners
+2. **Install Dependencies:**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+   Run the following command to install the required PHP dependencies:
 
-## Contributing
+   ```bash
+   composer install
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **Set Up Environment Configuration:**
 
-## Code of Conduct
+   Copy the `.env.example` file to `.env`:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+   ```bash
+   cp .env.example .env
+   ```
 
-## Security Vulnerabilities
+4. **Generate the Application Key:**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+   ```bash
+   php artisan key:generate
+   ```
 
-## License
+5. **Configure Your Mail Service:**
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+   Ensure you have the correct mail configuration in the `.env` file. Example configuration for SMTP:
+
+   ```env
+   MAIL_MAILER=smtp
+   MAIL_HOST=smtp.mailtrap.io
+   MAIL_PORT=2525
+   MAIL_USERNAME=null
+   MAIL_PASSWORD=null
+   MAIL_ENCRYPTION=null
+   MAIL_FROM_ADDRESS="no-reply@essentialnews.ng"
+   MAIL_FROM_NAME="${APP_NAME}"
+   ```
+
+6. **Set Up the Database:**
+
+   Run the following command to create your database and apply migrations:
+
+   ```bash
+   php artisan migrate
+   ```
+
+   You can modify your database settings in the `.env` file as needed.
+
+---
+
+## **API Endpoints**
+
+### **1. POST /subscribe**
+
+#### **Description:**
+
+Subscribe a user to the newsletter. If the email is already subscribed, a re-subscription process will occur with the welcome email being resent.
+
+#### **Request URL:**
+
+`POST https://news-letter.essentialnews.ng/api/subscribe`
+
+#### **Request Headers:**
+
+* `Content-Type`: `application/json`
+
+#### **Request Body Parameters:**
+
+| Field      | Type   | Description                                                                                  | Example                            |
+| ---------- | ------ | -------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `email`    | string | **Required**. The email address of the subscriber.                                           | `newslleteeee44eeteeest@gmail.com` |
+| `platform` | string | **Required**. The platform or website where the user is subscribing from.                    | `adex website`                     |
+| `honeypot` | string | **Optional**. Hidden field used to trap bots. If filled, the request is considered as a bot. | `null`                             |
+
+#### **Response:**
+
+* **Success (New Subscription):**
+
+  ```json
+  {
+      "message": "Successfully subscribed!"
+  }
+  ```
+
+* **Success (Already Subscribed - Welcome Email Sent Again):**
+
+  ```json
+  {
+      "message": "This email is already subscribed, but we’ve resent the welcome email!"
+  }
+  ```
+
+* **Error (Email Already Subscribed):**
+
+  ```json
+  {
+      "message": "This email is already subscribed."
+  }
+  ```
+
+* **Error (IP Blocked):**
+
+  ```json
+  {
+      "message": "Your IP has been blacklisted."
+  }
+  ```
+
+* **Error (Bot Detected):**
+
+  ```json
+  {
+      "message": "Bot detected. Subscription rejected."
+  }
+  ```
+
+* **Error (Internal Server Error):**
+
+  ```json
+  {
+      "message": "An error occurred while processing your subscription."
+  }
+  ```
+
+---
+
+### **2. GET /unsubscribe/{token}**
+
+#### **Description:**
+
+Unsubscribe a user from the newsletter using a unique token that was provided during the subscription process.
+
+#### **Request URL:**
+
+`GET https://news-letter.essentialnews.ng/api/unsubscribe/{token}`
+
+#### **Path Parameters:**
+
+| Field   | Type   | Description                                                        | Example                                                        |
+| ------- | ------ | ------------------------------------------------------------------ | -------------------------------------------------------------- |
+| `token` | string | **Required**. The unique token sent to the user for unsubscribing. | `Ti80i950TpTAjhy1W8psBBRcizVA3TgMgK08gGrEJcIhzUwdEV49fkTgtL2j` |
+
+#### **Response:**
+
+* **Success (Unsubscribed):**
+
+  ```json
+  {
+      "message": "You have been successfully unsubscribed."
+  }
+  ```
+
+* **Error (Invalid or Expired Token):**
+
+  ```json
+  {
+      "message": "Invalid or expired unsubscribe link."
+  }
+  ```
+
+---
+
+## **Rate Limiting**
+
+The `/subscribe` route has a rate limit of **2 requests per minute per user** to prevent abuse, enforced by the `custom_throttle` middleware (`2,1`).
+
+---
+
+## **Error Handling**
+
+The API returns JSON responses with appropriate HTTP status codes:
+
+* **200 OK**: Successful request.
+* **201 Created**: New resource created (e.g., new subscriber).
+* **400 Bad Request**: Invalid request (e.g., email already exists).
+* **403 Forbidden**: IP blocked due to blacklisting.
+* **404 Not Found**: Unsubscribe link invalid or expired.
+* **500 Internal Server Error**: Unexpected server errors.
+
+---
+
+## **Contributing**
+
+We welcome contributions to improve the functionality and features of this project. To contribute:
+
+1. Fork the repository.
+2. Create a new branch for your feature or fix.
+3. Submit a pull request with a clear description of your changes.
+
+---
+
+## **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## **Contact**
+
+For any questions or support, feel free to reach out to us at:
+
+* **Email**: [webmasterjdd@gmail.com](mailto:webmasterjdd@gmail.com)
+* **Website**: [https://dev.connectnesthub.com/](https://dev.connectnesthub.com/)
+
+---
+

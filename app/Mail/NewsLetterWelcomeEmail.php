@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Subscriber;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -11,22 +12,23 @@ use Illuminate\Queue\SerializesModels;
 
 class NewsLetterWelcomeEmail extends Mailable
 {
-    use SerializesModels;
+    use Queueable, SerializesModels;
 
-    // You can pass any data to the email, e.g., the user name
-    public $email;
+    public $subscriber;
 
-    public function __construct($email)
+    public function __construct(Subscriber $subscriber)
     {
-        $this->email = $email;
+        $this->subscriber = $subscriber;
     }
 
-    public function build()
-    {
-        return $this->view('emails.newsletter-welcome')
-                    ->subject('Welcome to Essential Nigeria!')
-                    ->with([
-                        'email' => $this->email,
-                    ]);
-    }
+   public function build()
+{
+    return $this->view('emails.newsletter-email')  
+        ->subject('Welcome to Essential Nigeria!')
+        ->with([
+            'email' => $this->subscriber->email,
+            'unsubscribeLink' => route('unsubscribe', ['token' => $this->subscriber->unsubscribe_token]),
+        ]);
+}
+
 }

@@ -9,5 +9,16 @@ class Subscriber extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['email'];
+    protected $fillable = [
+        'email', 
+        'platform', 
+        'unsubscribe_token', 
+        'ip_address', 
+        'user_agent', 
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'string',
+    ];
 }
